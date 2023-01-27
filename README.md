@@ -13,10 +13,8 @@ counselling and testing Facilities for HIV
 * WHO
 https://www.who.int/data/gho/data/indicators/indicator-details/GHO/hiv-testing-and-counselling---testing-and-counselling-facilities
 
-GDP per country
-* OECD
-*  https://www.oecd-ilibrary.org/economics/gdp-and-spending/indicator-group/english_4537dc58-en
-
+Mortality per country
+* WHO
 
 CHALLENGES
 - exporting data collected via API, from json to something useful
@@ -25,14 +23,16 @@ CHALLENGES
 Process-
 - started with subject - and identidied API wrapper for WHO data sets
 - explored WHO website for data and settled on the area of HIV as the data sets were extensive and very complete.
+- API used to extract for the WHO sources of data
 - Exploration of other sources of date:
     - initially thought about exploring investment in healthcare, but quickly became clear that data was limited.
     - based on published article found sources for expenditure on HIV by country
+    - a csv file was downloaded containing this data
 - 4 data sets identified
-    - number of cases per country
-    - mortality per country
-    - testing and counseling facilities per country (data already normalised (nb per 100,000 inhabitants)
-    - expenditure per country
+    - number of cases per country (API)
+    - mortality per country (API)
+    - testing and counseling facilities per country (data already normalised (nb per 100,000 inhabitants) (API)
+    - expenditure per country (downloaded as csv file)
 - data imported and cleaned
 - data normalised
 - indicator calculated
