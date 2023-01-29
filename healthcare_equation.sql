@@ -12,17 +12,17 @@ RENAME COLUMN `sum(exp_K$)` TO exp_K$;
 
 
 
-CREATE TEMPORARY TABLE IF NOT EXISTS NormalizedTable
-SELECT F.area, F.year, facilities, Deaths, Cases, Expenses FROM
+CREATE TEMPORARY TABLE  NormalizedTable
+SELECT F.area, F.year, facilities, perc_deaths, Cases, access_meds, Expend_PP FROM
 	(SELECT area, year,
-			(nb_fac_per_100k-(SELECT MIN(nb_fac_per_100k) FROM composite_2021)) / 
+		(nb_fac_per_100k-(SELECT MIN(nb_fac_per_100k) FROM composite_2021)) / 
 			(SELECT (MAX(nb_fac_per_100k)-MIN(nb_fac_per_100k)) FROM composite_2021) 
 			AS Facilities FROM composite_2021) F
 left join 
 	(select area, 
-			(nb_deaths-(SELECT MIN(nb_deaths) FROM composite_2021)) / 
-			(SELECT (MAX(nb_deaths)-MIN(nb_deaths)) FROM composite_2021) 
-			AS Deaths FROM composite_2021) D 
+			(percent_deaths-(SELECT MIN(percent_deaths) FROM composite_2021)) / 
+			(SELECT (MAX(percent_deaths)-MIN(percent_deaths)) FROM composite_2021) 
+			AS perc_Deaths FROM composite_2021) D 
 	on F.area=D.area
 left join 
 	(select area, 
@@ -32,16 +32,25 @@ left join
 	on F.area = N.area
 left join
 	(select area, 
-			(exp_K$-(SELECT MIN(exp_K$) FROM composite_2021)) / 
-            (SELECT (MAX(exp_K$)-MIN(exp_K$)) FROM composite_2021) 
-            AS Expenses FROM composite_2021) E
-	on F.area = E.area;
+			(exp_pperson-(SELECT MIN(exp_pperson) FROM composite_2021)) / 
+            (SELECT (MAX(exp_pperson)-MIN(exp_pperson)) FROM composite_2021) 
+            AS Expend_pp FROM composite_2021) E
+	on F.area = E.area
+    left join
+	(select area, 
+			(percent_access_meds-(SELECT MIN(percent_access_meds) FROM composite_2021)) / 
+            (SELECT (MAX(percent_access_meds)-MIN(percent_access_meds)) FROM composite_2021) 
+            AS access_meds FROM composite_2021) M
+	on M.area = E.area;
 
 -- Use the temporary table to calculate the indicators of each country
+
 create table HIV_indicators
-select area, year, Facilities, Deaths, Cases, Expenses, hiv_indicators
-	(Facilities*2 + Deaths*(-1) + Cases*(-1) + Expenses*2) AS indicators 
+select area, year, Facilities, perc_Deaths, Cases, access_meds, Expend_pp, 
+	(Facilities*0.5 + perc_Deaths*(-1) + Cases*(-1) + access_meds*1 + Expend_pp*1) AS indicators 
 	FROM NormalizedTable order by indicators desc;
+    
+    select * from HIV_indicators;
 
 
 
